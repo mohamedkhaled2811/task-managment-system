@@ -15,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpStatus;
 
 @Configuration
 @RequiredArgsConstructor
@@ -57,8 +59,10 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated()
 
-                ).headers(h -> h.frameOptions(f -> f.disable()))
-                .addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);;
+                ).exceptionHandling(ex -> ex
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .headers(h -> h.frameOptions(f -> f.disable()))
+                .addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
